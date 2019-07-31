@@ -3,7 +3,7 @@
 
 class SGraph{
 
-    constructor(parent, width, bg, title, data){
+    constructor(parent, width, bg, title, data, label1, label2, postFix, maxValue){
 
         this.parent = document.getElementById(parent);
         this.ns = "http://www.w3.org/2000/svg";
@@ -17,6 +17,8 @@ class SGraph{
         this.maxData = 0;
         this.valueOffset = 0;
 
+        this.maxDecimalsPlaces = 3;
+
         this.lastUpdate = 0;
 
         this.data = data;
@@ -27,9 +29,15 @@ class SGraph{
             "rgb(60,255,60)",
             "yellow",
             "orange",
-            "pink"
+            "pink",
+            "white",
+            "rgb(150,150,150)"
         ];
 
+
+        this.postFix = postFix;
+        this.label1 = label1;
+        this.label2 = label2;
 
         this.mouseOverId = "svg-sgraph-mouse-over";
 
@@ -50,6 +58,10 @@ class SGraph{
 
         
         this.getSGraphCount();
+
+       // this.maxValue = maxValue;
+
+        this.inputMaxValue = maxValue;
 
         this.setMaxValue();
 
@@ -137,65 +149,18 @@ class SGraph{
         return (this.height / 100) * input;
     }
 
-    /*hideMouseOver(){
-
-        const now = performance.now() / 1000;
-
-        //console.log(now - this.lastUpdate);
-        if(now - this.lastUpdate > 1){
-            this.updateMouseOver(-999,-999,"","");
-        }
-    }*/
-
-    /*drawMouseOver(){
-
-        //console.log("drawmouseover");
-
-        this.drawRect(-9999, -9999, this.x(20), this.y(15),"fill:rgba(32,32,32,0.95);stroke:rgba(255,255,255,0.1);stroke-width:"+this.y(0.5)+"px;", this.mouseOverId);
-
-    }*/
-
-    /*updateMouseOver(x, y, title, text){
-
-
-        this.lastUpdate = performance.now() / 1000;
-
-       // console.log(x+" , "+y);
-        const e = document.getElementById(this.mouseOverId);
-
-        const bounds = e.getBoundingClientRect();
-
-        const parentBounds = this.elem.getBoundingClientRect();
-
-        const width = bounds.width;
-        const height = bounds.height;
-
-        //console.log(bounds);
-        //const boxX = e.
-
-        if(x + width >= parentBounds.width){
-
-            const offset = (parentBounds.width) - (x + width);
-
-            x = parentBounds.width - width;
-        }
-
-        e.setAttribute("x", x);
-        e.setAttribute("y", y + this.y(4));// = this.y(y);
-        
-    }*/
 
     updateMouseOver(e, x, y, title, text){
-
-        console.log(e);
 
         const parentBounds = this.elem.getBoundingClientRect();
 
        // console.log(parentBounds);
         this.mouseOverTitle.innerHTML = title;
-        this.mouseOverContent.innerHTML = text;
+        this.mouseOverContent.innerHTML = this.removeDecimals(text)+this.postFix;
 
-        this.mouseOver.style.cssText = `margin-left:${e.clientX}px;margin-top:${e.clientY - parentBounds.height}px;`;
+
+        //console.log(parentBounds);
+        this.mouseOver.style.cssText = `margin-left:${e.clientX}px;margin-top:${e.clientY -   parentBounds.height + 50 + parentBounds.top}px;`;
 
         
     }
@@ -292,10 +257,10 @@ class SGraph{
     removeDecimals(value){
 
         const offset = value % 1;
-        console.log("offset = "+offset);
+        //console.log("offset = "+offset);
 
         if(offset != 0){
-            return value.toFixed(2);
+            return value.toFixed(this.maxDecimalsPlaces);
         }
 
         return value;
@@ -312,7 +277,7 @@ class SGraph{
         const barHeight = this.y(2);
 
         const textOffsetX = this.x(13);
-        const fontSize = 2.25;
+        const fontSize = 3;
 
         elem.setAttribute("d",`
         m ${this.x(this.gridStartX)} ${this.y(this.gridStartY) - this.y(this.graphHeight)} 
@@ -398,7 +363,7 @@ class SGraph{
         const dotSize = this.y(1);
 
 
-        const dataOffset = this.graphWidth / this.maxData;
+        const dataOffset = this.graphWidth / (this.maxData - 1);
 
         const dataBit = this.graphHeight / this.totalValueOffset;
 
@@ -438,10 +403,10 @@ class SGraph{
                 currentData = startY - (dataBit * (this.data[z].data[i] + yOffset));
                 nextData = startY - (dataBit * (this.data[z].data[i+1] + yOffset));
 
-                x = this.x(startX + (dataOffset * (i + 1)));
+                x = this.x(startX + (dataOffset * (i)));
                 y = this.y(currentData) + (dotSize / 2);
 
-                nextX = this.x(startX + (dataOffset * (i + 2))) ;
+                nextX = this.x(startX + (dataOffset * (i + 1))) ;
                 nextY = this.y(nextData) + (dotSize / 2);
 
                // this.drawCircle(x, y, this.x(0.2), this.colors[z], true);
@@ -456,13 +421,13 @@ class SGraph{
                         //console.log(cx+" , "+cy);
 
 
-                        currentElem = this.drawLine(cx, cy, nextX - cx, nextY - cy, this.x(0.2), this.colors[z]);
+                        currentElem = this.drawLine(cx, cy, nextX - cx, nextY - cy, this.x(0.15), this.colors[z]);
 
                         currentElem.addEventListener("mousemove", (e) =>{
 
                             //this.updateMouseOver(cx,cy, "title", "text");
 
-                            this.updateMouseOver(e, cx,cy,"Title",this.data[z].data[i]);
+                            this.updateMouseOver(e, cx, cy, this.data[z].name+' '+this.title+' (data point '+(i+1)+')', this.data[z].data[i]);
                         });
 
                    // })();
@@ -472,6 +437,39 @@ class SGraph{
                 //this.drawRect(this.x(startX + (dataOffset * (i + 1))) - (dotSize / 2), this.y(currentData) - (dotSize / 2), dotSize, dotSize, "fill:red");
 
             }
+        }
+    }
+
+    drawKeys(){
+
+
+        const startY = this.y(85);
+        const startX = this.x(5);
+        const startX2 = this.x(45);
+
+        const rowHeight = this.y(3.7);
+
+
+        let x = 0;
+        let y = 0;
+
+        const boxSize = this.x(1.6);
+
+        for(let i = 0; i < this.data.length; i++){
+
+
+            x = startX;
+
+            if(i > 3){
+                x = startX2;
+            }
+            
+            y = startY + (rowHeight * (i % 4));
+
+
+            this.drawRect(x, y, boxSize, boxSize, "fill:"+this.colors[i]+";stroke-width:"+this.y(0.25)+";stroke:black;");
+            this.drawText(x + (boxSize * 1.2), y + (rowHeight * 0.7), this.data[i].name, "fill:white;text-anchor:top;font-size:"+this.y(3.2)+"px;");
+
         }
     }
 
@@ -495,10 +493,16 @@ class SGraph{
 
         this.plotData();
 
+        this.drawKeys();
+
 
     }
 
     setMaxValue(){
+
+
+        //const inputMaxRange = this.maxRange;
+        
 
         let d = 0;
 
@@ -553,6 +557,14 @@ class SGraph{
             this.minValue = 0;
         }
 
+
+        if(this.inputMaxValue != null){
+
+            this.maxValue = this.inputMaxValue;
+            //this.minValue = 0;
+            //return;
+        }
+
         const offset = this.maxValue - this.minValue;
 
         this.totalValueOffset = offset;
@@ -563,15 +575,15 @@ class SGraph{
 
 
 
-function createData(amount, range, multiplier){
+function createData(amount, start, range){
 
-    let value = 0;
+    let value = 50;
 
     const data = [];
 
     for(let i = 0; i < amount; i++){
 
-        value += range + (Math.random() * (range * multiplier));
+        value = start + (-range  + (Math.random() * (range * 2 )));
 
         data.push(value);
     }
@@ -582,19 +594,19 @@ function createData(amount, range, multiplier){
 
 
 
+
+
 const testData = [
-    {"name":"data - 1", "data": createData(50,1,1)}, 
-    {"name": "data - 2", "data": createData(50,1,0.9)},
-    {"name": "data - 3", "data": createData(50,1,1.1)},
-    {"name": "data - 4", "data": createData(50,1,1.3)}
+    {"name":"Ooper", "data": createData(100,30,10)}, 
+    {"name": "Potato", "data": createData(100,25,8)},
+    {"name": "Blaze the cheater", "data": createData(100,50,25)},
+    {"name": "Donkey", "data": createData(100,24,1)},
+    {"name": "Vodka", "data": createData(100,4,1)},
+    {"name": "Tuna can", "data": createData(100,5,1)},
+    {"name": "A4 Paper", "data": createData(100,12,1)},
+    {"name": "A3 Paper", "data": createData(100,24,1)}
 ];
 
-new SGraph("box-1",1200, "rgb(32,32,32)", "Frag Performance", testData);
-new SGraph("box-1",1200, "rgb(32,32,32)", "Frag Performance", testData);
-new SGraph("box-1",1200, "rgb(32,32,32)", "Frag Performance", testData);
-new SGraph("box-1",1200, "rgb(32,32,32)", "Frag Performance", testData);
-new SGraph("box-1",1200, "rgb(32,32,32)", "Frag Performance", testData);
-new SGraph("box-1",1200, "rgb(32,32,32)", "Frag Performance", testData);
-new SGraph("box-1",1200, "rgb(32,32,32)", "Frag Performance", testData);
-new SGraph("box-1",1200, "rgb(32,32,32)", "Frag Performance", testData);
-new SGraph("box-1",1200, "rgb(32,32,32)", "Frag Performance", testData);
+new SGraph("box-1",600, "rgb(32,32,32)", "Accuracy", testData, "label 1", "label 2", "%", 100);
+new SGraph("box-1",1200, "rgb(32,32,32)", "Accuracy", testData, "label 1", "label 2", "%",100);
+
