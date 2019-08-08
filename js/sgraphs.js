@@ -419,6 +419,8 @@ class SGraph{
 
         let currentElem = 0;
 
+        const lineWidth = this.x(0.15);
+
         for(let z = 0; z < this.data.length; z++){
 
         
@@ -433,10 +435,10 @@ class SGraph{
                 nextData = startY - (dataBit * (this.data[z].data[i+1] + yOffset));
 
                 x = this.x(startX + (dataOffset * (i)));
-                y = this.y(currentData) + (dotSize / 2);
+                y = this.y(currentData) + (dotSize / 2) - lineWidth - lineWidth;
 
                 nextX = this.x(startX + (dataOffset * (i + 1))) ;
-                nextY = this.y(nextData) + (dotSize / 2);
+                nextY = this.y(nextData) + (dotSize / 2) - lineWidth - lineWidth;
 
                 this.drawCircle(x, y, this.x(0.15), this.colors[z], true);
 
@@ -450,13 +452,13 @@ class SGraph{
                         //console.log(cx+" , "+cy);
 
 
-                        currentElem = this.drawLine(cx, cy, nextX - cx, nextY - cy, this.x(0.15), this.colors[z]);
+                        currentElem = this.drawLine(cx, cy, nextX - cx, nextY - cy, lineWidth, this.colors[z]);
 
                         currentElem.addEventListener("mousemove", (e) =>{
 
                             //this.updateMouseOver(cx,cy, "title", "text");
 
-                            this.updateMouseOver(e, cx, cy, this.data[z].name+' (data point '+(i+1)+')', this.data[z].data[i]);
+                            this.updateMouseOver(e, cx, cy, this.data[z].name+' (data point '+(i+1)+')', this.data[z].data[i+1]);
                         });
 
                         currentElem.addEventListener("mouseout", () =>{
