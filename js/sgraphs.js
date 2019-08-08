@@ -185,7 +185,7 @@ class SGraph{
 
         this.elem.id = "s-graphs-"+this.graphId;
 
-        const parentBounds = document.getElementById(this.parent);
+        const parentBounds = this.parent.getBoundingClientRect();
 
         this.width = parentBounds.width * this.width;
         this.height = this.width * 0.5625;
@@ -631,19 +631,4 @@ function createData(amount, start, range){
 
 
 
-
-
-const testData = [
-    {"name":"Ooper", "data": createData(100,30,10)}, 
-    {"name": "Potato", "data": createData(100,25,8)},
-    {"name": "Blaze the cheater", "data": createData(100,50,25)},
-    {"name": "Donkey", "data": createData(100,24,1)},
-    {"name": "Vodka", "data": createData(100,4,1)},
-    {"name": "Tuna can", "data": createData(100,5,1)},
-    {"name": "A4 Paper", "data": createData(100,12,1)},
-    {"name": "A3 Paper", "data": createData(100,24,1)}
-];
-
-new SGraph("box-1",600, "rgb(32,32,32)", "Accuracy", testData,  "Accuracy", "Matches (newest first)", "%", 100);
-new SGraph("box-1",1200, "rgb(32,32,32)", "Accuracy", testData, "Accuracy", "Matches (newest first)", "%",100);
 
