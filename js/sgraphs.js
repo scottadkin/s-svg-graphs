@@ -95,9 +95,9 @@ class SGraph{
 
         // this.parent.appendChild(elem);
             
-            const elems = document.getElementsByTagName("div");
-            const last = elems[elems.length - 1]; 
-            last.appendChild(elem);
+            //const elems = document.getElementsByTagName("div");
+            //const last = elems[0]; 
+            document.body.appendChild(elem);
 
             //title elem
 
@@ -160,7 +160,7 @@ class SGraph{
 
 
         //console.log(parentBounds);
-        this.mouseOver.style.cssText = `margin-left:${e.clientX}px;margin-top:${e.clientY -   parentBounds.height + 50 + parentBounds.top}px;`;
+        this.mouseOver.style.cssText = `margin-left:${e.clientX}px;margin-top:${e.clientY}px;`;
 
         
     }
@@ -170,6 +170,10 @@ class SGraph{
         this.elem = document.createElementNS(this.ns,"svg");
 
         this.elem.id = "s-graphs-"+this.graphId;
+        const parentBounds = this.parent.getBoundingClientRect();
+
+        this.width = parentBounds.width * 0.5;
+        this.height = this.width * 0.5625;
 
         //this.mouseOverId = "s-graphs-mouseover-"+this.graphId;
 
@@ -179,6 +183,10 @@ class SGraph{
         this.elem.setAttribute("height", this.height);
 
         this.parent.appendChild(this.elem);
+
+        
+        
+        
 
         
     }
@@ -593,20 +601,4 @@ function createData(amount, start, range){
 }
 
 
-
-
-
-const testData = [
-    {"name":"Ooper", "data": createData(100,30,10)}, 
-    {"name": "Potato", "data": createData(100,25,8)},
-    {"name": "Blaze the cheater", "data": createData(100,50,25)},
-    {"name": "Donkey", "data": createData(100,24,1)},
-    {"name": "Vodka", "data": createData(100,4,1)},
-    {"name": "Tuna can", "data": createData(100,5,1)},
-    {"name": "A4 Paper", "data": createData(100,12,1)},
-    {"name": "A3 Paper", "data": createData(100,24,1)}
-];
-
-new SGraph("box-1",600, "rgb(32,32,32)", "Accuracy", testData, "label 1", "label 2", "%", 100);
-new SGraph("box-1",1200, "rgb(32,32,32)", "Accuracy", testData, "label 1", "label 2", "%",100);
 
