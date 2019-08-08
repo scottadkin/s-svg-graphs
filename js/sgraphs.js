@@ -248,6 +248,10 @@ class SGraph{
 
     drawCircle(x, y, size, color, bMouseOverElem){
 
+        if(x != x || y != y){
+            return;
+        }
+
         const elem = document.createElementNS(this.ns, "circle");
 
         elem.setAttribute("cx", x);
@@ -371,10 +375,14 @@ class SGraph{
 
     drawLine(sx, sy, ex, ey, width, color){
 
+        if(ex != ex || ey != ey || sx != sx || sy != sy){
+            return null;
+        }
         const elem = document.createElementNS(this.ns, "path");
 
         elem.setAttribute("style", "stroke:"+color+";stroke-width:"+width+"px;");
 
+        
         elem.setAttribute("d", `
         m ${sx} ${sy}
         l ${ex} ${ey}
@@ -440,12 +448,16 @@ class SGraph{
                 nextX = this.x(startX + (dataOffset * (i + 1))) ;
                 nextY = this.y(nextData) + (dotSize / 2) - lineWidth - lineWidth;
 
-                this.drawCircle(x, y, this.x(0.15), this.colors[z], true);
+                
 
                 if(i < this.maxData - 1){
 
                    // (() =>{
+                       //console.log(x);
 
+                        if(x > 30){
+                            this.drawCircle(x, y, this.x(0.15), this.colors[z], true);
+                        }
                         const cx = x;
                         const cy = y;
 
@@ -454,17 +466,19 @@ class SGraph{
 
                         currentElem = this.drawLine(cx, cy, nextX - cx, nextY - cy, lineWidth, this.colors[z]);
 
-                        currentElem.addEventListener("mousemove", (e) =>{
+                        if(currentElem != null){
+                            currentElem.addEventListener("mousemove", (e) =>{
 
-                            //this.updateMouseOver(cx,cy, "title", "text");
+                                //this.updateMouseOver(cx,cy, "title", "text");
 
-                            this.updateMouseOver(e, cx, cy, this.data[z].name+' (data point '+(i+1)+')', this.data[z].data[i+1]);
-                        });
+                                this.updateMouseOver(e, cx, cy, this.data[z].name+' (data point '+(i+1)+')', this.data[z].data[i+1]);
+                            });
 
-                        currentElem.addEventListener("mouseout", () =>{
+                            currentElem.addEventListener("mouseout", () =>{
 
-                            this.hideMouseOver();
-                        });
+                                this.hideMouseOver();
+                            });
+                        }
 
                    // })();
                     
