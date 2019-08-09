@@ -193,8 +193,12 @@ class SGraph{
 
         this.elem.setAttribute("class","s-graphs");
 
-        this.elem.setAttribute("width", this.width);
-        this.elem.setAttribute("height", this.height);
+        if(this.width == this.width){
+            this.elem.setAttribute("width", this.width);
+        }
+        if(this.height == this.height){
+            this.elem.setAttribute("height", this.height);
+        }
 
         this.parent.appendChild(this.elem);
 
@@ -210,10 +214,18 @@ class SGraph{
 
         const elem = document.createElementNS(this.ns, "rect");
 
-        elem.setAttribute("x", x);
-        elem.setAttribute("y", y);
-        elem.setAttribute("width", width);
-        elem.setAttribute("height", height);
+        if(x == x){
+            elem.setAttribute("x", x);
+        }
+        if(y == y){
+            elem.setAttribute("y", y);
+        }
+        if(width == width){
+            elem.setAttribute("width", width);
+        }
+        if(height == height){
+            elem.setAttribute("height", height);
+        }
 
         elem.setAttribute("style", style);
         
@@ -237,8 +249,12 @@ class SGraph{
        // x = this.x(x);
        // y = this.y(y);
 
-        elem.setAttribute("x",x);
-        elem.setAttribute("y",y);
+        if(x == x){
+            elem.setAttribute("x",x);
+        }
+        if(y == y){
+            elem.setAttribute("y",y);
+        }
         elem.setAttribute("style",style);
         
         elem.innerHTML = text;
@@ -303,6 +319,11 @@ class SGraph{
 
         const valueOffset = this.y(this.graphHeight) / 4;
         const dataOffset = this.x(this.graphWidth) / this.maxData;
+
+        if(valueOffset != valueOffset){
+            console.trace("Warning: valueOffset is NaN, skipping drawAxes!");
+            return;
+        }
 
         const barWidth = this.x(1);
         const barHeight = this.y(2);
@@ -434,9 +455,16 @@ class SGraph{
         
             for(let i = 0; i < this.maxData; i++){
 
+
+                if(this.data[z].data == undefined){
+                    break;
+                }
+                
                 if(i >= this.data[z].data.length -1){
                     break;
                 }
+
+                
 
                 //console.log(i);
                 currentData = startY - (dataBit * (this.data[z].data[i] + yOffset));
@@ -574,27 +602,30 @@ class SGraph{
 
             currentData = 0;
 
-            for(let x = 0; x < this.data[i].data.length; x++){
+            if(this.data[i].data != undefined){
+                for(let x = 0; x < this.data[i].data.length; x++){
 
-                currentData++;
+                    currentData++;
 
-                d = this.data[i].data[x];
+                    d = this.data[i].data[x];
 
-                if(i == 0 && x == 0){
+                    if(i == 0 && x == 0){
 
-                    this.maxValue = d;
-                    this.minValue = d;
+                        this.maxValue = d;
+                        this.minValue = d;
 
-                }else if(d > this.maxValue){
+                    }else if(d > this.maxValue){
 
-                    this.maxValue = d;
+                        this.maxValue = d;
 
-                }else if(d < this.minValue){
+                    }else if(d < this.minValue){
 
-                    this.minValue = d;
+                        this.minValue = d;
 
+                    }
                 }
-
+            }else{
+                continue;
             }
         }
 
